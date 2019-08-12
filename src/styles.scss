@@ -1,1 +1,8 @@
 /* You can add global styles to this file, and also import other style files */
+$as-blue: #01426a;
+
+body {
+  background-color: $as-blue;
+  color: white;
+  font-family: Arial, Helvetica, sans-serif;
+}

@@ -6,10 +6,16 @@ import * as signalR from '@aspnet/signalr';
 })
 export class SignalrService {
   connection: signalR.HubConnection;
-  messageRecieved: EventEmitter<string>;
+  cardDataRecieved: EventEmitter<string>;
+  guestJoinedEvent: EventEmitter<void>;
+  guestJoined: boolean;
+  guestId = '';
+  connectionId: string;
+
   constructor() {
     this.createConnection();
-    this.messageRecieved = new EventEmitter<string>();
+    this.cardDataRecieved = new EventEmitter<string>();
+    this.guestJoinedEvent = new EventEmitter<void>();
   }
 
   private createConnection(): void {
@@ -24,12 +30,21 @@ export class SignalrService {
     this.connection
       .start()
       .then(() => {
-        this.connection.on(`ReceiveMessage`, (payload: string) => {
-          this.messageRecieved.emit(payload);
-          console.log(`message recieved: ${payload}`);
+        this.connection.on(`RecieveCardData`, (payload: string) => {
+          this.cardDataRecieved.emit(payload);
         });
-        this.connection.on(`UserConnected`, (connectionId: string) => {
-          console.log(`connected: ${connectionId}`);
+        this.connection.on(`UserConnected`, (guestId: string) => {
+          if (this.guestJoined) {
+            console.log('MULTIPLE GUESTS CONNECTED');
+          } else {
+            this.guestJoined = true;
+            this.guestId = guestId;
+          }
+          console.log('user connected?');
+          this.guestJoinedEvent.emit();
+        });
+        this.connection.on(`Connected`, (connectionId: string) => {
+          this.connectionId = connectionId;
         });
       })
       .catch(err => {
@@ -42,4 +57,14 @@ export class SignalrService {
       console.log(`created group: ${groupName}`);
     });
   }
+
+  public promptForPayment(): void {
+    this.connection.invoke(`PromptForPayment`, this.guestId, `$50.00|${this.connectionId}`).then(() => {
+    });
+  }
+  public notifyPaymentStatus(): void {
+    this.connection.invoke(`NotifyPaymentStatus`, this.guestId, `Payment successful`).then(() => {
+    });
+  }
+
 }

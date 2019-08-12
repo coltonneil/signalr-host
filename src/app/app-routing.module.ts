@@ -4,6 +4,7 @@ import { SecureConnectionComponent } from './secure-connection/secure-connection
 
 
 const routes: Routes = [
+  {path: '', redirectTo: 'connect', pathMatch: 'full' },
   {path: 'connect', component: SecureConnectionComponent }
 ];
 

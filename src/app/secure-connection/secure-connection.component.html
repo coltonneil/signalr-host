@@ -1,3 +1,21 @@
-<button (click)="createGroup()">Create Group</button>
-<div *ngIf="groupId?.length">{{groupId}}</div>
-<h1>{{message}}</h1>
+<div class="container">
+  <button *ngIf="!groupId.length" (click)="createGroup()">Create Group</button>
+  <div *ngIf="groupId.length && !connectedToGuest" class="group-id">{{groupId}}</div>
+  <div *ngIf="connectedToGuest && !paymentRequested">
+      <div>Connected</div>
+      <button (click)="promptForPayment()">Prompt For Payment</button>
+  </div>
+  <div *ngIf="paymentRequested && !paymentProcessed">
+      <img class="loading-icon" src="./assets/loading.svg">
+      <span class="status">{{status}}</span>
+  </div>
+  <div *ngIf="paymentProcessed">
+      <img class="success-icon" src="./assets/success.svg">
+      <span class="status">{{status}}</span>
+  </div>
+</div>
+
+
+
+
+
